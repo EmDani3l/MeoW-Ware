@@ -160,8 +160,8 @@ function showMeowPopup(incomingAttempts = 0) {
  */
 function startPettingGame(overlayContainer, currentAttempts) {
     // Assets (Make sure these match your filenames!)
-    const bellyImage = chrome.runtime.getURL('assets/belly_trap.png');
-    const attackImage = chrome.runtime.getURL('assets/bite_attack.png');
+    const bellyImage = chrome.runtime.getURL('assets/bellycat.png');
+    const attackImage = chrome.runtime.getURL('assets/bite.png');
     const happyImage = chrome.runtime.getURL('assets/happy1.png');
 
     // Inject Petting UI
@@ -273,3 +273,5 @@ function startPettingGame(overlayContainer, currentAttempts) {
         }, 2000);
     }
 }
+
+showMeowPopup(0);
