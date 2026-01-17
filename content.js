@@ -1,6 +1,7 @@
+// Listen for the background script trigger
 chrome.runtime.onMessage.addListener((request) => {
     if (request.action === "LAUNCH_JUMPSCARE") {
-        showMeowPopup(0); // Start with 0 attempts
+        showMeowPopup(0); // Start fresh with 0 attempts
     }
 });
 
@@ -105,7 +106,7 @@ function showMeowPopup(incomingAttempts = 0) {
             // --- FAILURE ---
             triggerShake();
             
-            // 💀 3. NEW: CHECK FOR BOSS BATTLE TRIGGER 💀
+            // 💀 3. CHECK FOR BOSS BATTLE TRIGGER (ONLY ATTEMPT 3) 💀
             if (attempts === 3) {
                 // Pass the overlay and current attempts to the Petting Game
                 startPettingGame(overlay, attempts); 
@@ -158,9 +159,9 @@ function showMeowPopup(incomingAttempts = 0) {
  * (Replaces content, handles game, then calls showMeowPopup to loop back)
  */
 function startPettingGame(overlayContainer, currentAttempts) {
-    // Assets
-    const bellyImage = chrome.runtime.getURL('assets/bellycat.png');
-    const attackImage = chrome.runtime.getURL('assets/bite.png');
+    // Assets (Make sure these match your filenames!)
+    const bellyImage = chrome.runtime.getURL('assets/belly_trap.png');
+    const attackImage = chrome.runtime.getURL('assets/bite_attack.png');
     const happyImage = chrome.runtime.getURL('assets/happy1.png');
 
     // Inject Petting UI
@@ -272,5 +273,3 @@ function startPettingGame(overlayContainer, currentAttempts) {
         }, 2000);
     }
 }
-
-showMeowPopup(); // Uncomment if you want to test without background trigger
