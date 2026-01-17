@@ -1,4 +1,3 @@
-// This runs when the background script sends the "LAUNCH" signal
 chrome.runtime.onMessage.addListener((request) => {
     if (request.action === "LAUNCH_JUMPSCARE") {
         showMeowPopup();
@@ -11,12 +10,33 @@ function getRandomVariant(baseName, count) {
 }
 
 function showMeowPopup() {
+    // 1. Generate Target
     const targetWs = Math.floor(crypto.getRandomValues(new Uint32Array(1))[0] / (0xFFFFFFFF + 1) * 10) + 1;
     console.log("DEBUG: The magic number of w's is:", targetWs);
     
+    // 2. Tab Title Hijack (Psychological Warfare)
+    const originalTitle = document.title;
+    let panicInterval;
+    
+    const startPanic = () => {
+        const messages = [
+            "⚠️ SYSTEM ERROR 404",
+            "🐈 MEOW_OVERFLOW DETECTED",
+            "Deleting System32...",
+            "Don't look behind you...",
+            "Uploading Browser History (99%)...",
+            "Calculating Meow Trajectory...",
+            "⚠️ VIRUS DETECTED: CAT.EXE"
+        ];
+        panicInterval = setInterval(() => {
+            document.title = messages[Math.floor(Math.random() * messages.length)];
+        }, 2000);
+    };
+    startPanic(); 
+
+    // 3. Create Overlay
     const overlay = document.createElement('div');
     overlay.id = "meow-overlay";
-    
     const jumpscareImage = getRandomVariant('jumpscare', 2);
     
     overlay.innerHTML = `
@@ -37,41 +57,32 @@ function showMeowPopup() {
     const submitButton = document.getElementById('submit-meow');
     const inputField = document.getElementById('meow-input');
     
-    // ============================================================
-    // 💀 NEW FEATURE 1: SABOTAGED INPUT (BROKEN BACKSPACE)
-    // ============================================================
+    // 4. Sabotaged Input (Broken Backspace)
     inputField.addEventListener('keydown', (e) => {
-        // If they try to backspace...
         if (e.key === 'Backspace') {
-            e.preventDefault(); // STOP them from deleting!
-            
-            // Instead, add another 'w' at the cursor position
+            e.preventDefault(); 
             const start = inputField.selectionStart;
             const end = inputField.selectionEnd;
             const text = inputField.value;
-            
-            // Insert 'w'
+            // Insert 'w' instead of deleting
             inputField.value = text.substring(0, start) + 'w' + text.substring(end);
-            
-            // Move cursor forward so they can keep typing (and suffering)
             inputField.selectionStart = inputField.selectionEnd = start + 1;
         }
     });
 
-    // ============================================================
-    // 💀 NEW FEATURE 2: SHAKE ANIMATION HELPER
-    // ============================================================
+    // 5. Shake Animation Trigger
     const triggerShake = () => {
-        // Requires the .shake-animation class in your CSS
         inputField.classList.add('shake-animation');
         setTimeout(() => inputField.classList.remove('shake-animation'), 500);
     };
     
+    // 6. Game Logic
     const handleSubmit = () => {
         const input = inputField.value.toLowerCase();
         const imgElement = document.getElementById('cat-display');
         const feedbackText = document.getElementById('feedback-text');
         
+        // Handle Tricked State
         if (isTricked) {
             const jumpscareImage = getRandomVariant('jumpscare', 2);
             imgElement.src = chrome.runtime.getURL(jumpscareImage);
@@ -80,24 +91,23 @@ function showMeowPopup() {
             isTricked = false;
             inputField.value = '';
             inputField.focus();
-            triggerShake(); // Shake on trick reveal
+            triggerShake();
             return;
         }
         
         attempts++;
         document.getElementById('attempt-count').textContent = attempts;
         
+        // Validate Spelling
         const meowPattern = /^me+o+w*$/;
-        const isValidMeow = meowPattern.test(input);
-
-        if (!isValidMeow || !input.includes('m') || !input.includes('e') || !input.includes('o')) {
+        if (!meowPattern.test(input) || !input.includes('m') || !input.includes('e') || !input.includes('o')) {
             const confusedImage = getRandomVariant('confused', 2);
             imgElement.src = chrome.runtime.getURL(confusedImage);
             feedbackText.textContent = "That's not even a meow! Try spelling it correctly... 🤔";
             feedbackText.style.color = "#ffa500";
             inputField.value = '';
             inputField.focus();
-            triggerShake(); // Shake on bad spelling
+            triggerShake(); 
             return;
         }
         
@@ -105,6 +115,10 @@ function showMeowPopup() {
         const distance = Math.abs(userWs - targetWs);
 
         if (distance === 0) {
+            // WINNER
+            clearInterval(panicInterval); // Stop panic
+            document.title = originalTitle; // Restore title
+            
             const happyImage = getRandomVariant('happy', 2);
             imgElement.src = chrome.runtime.getURL(happyImage);
             feedbackText.textContent = `Perfect! You're free! 🎉 (${attempts} attempts)`;
@@ -113,16 +127,15 @@ function showMeowPopup() {
             inputField.disabled = true;
             setTimeout(() => overlay.remove(), 2000);
         } else {
-            // IF THEY ARE WRONG -> TRIGGER SHAKE
+            // LOSER
             triggerShake();
             
             if (distance === 10) {
+                // The Trap
                 imgElement.src = chrome.runtime.getURL('assets/tricked1.png');
                 feedbackText.textContent = "🎊 PERFECT! You won! Click Submit to claim your freedom! 🎊";
                 feedbackText.style.color = "#4ecca3";
                 isTricked = true;
-                inputField.value = '';
-                inputField.focus();
             } else if (distance === 6 || distance === 7) {
                 imgElement.src = chrome.runtime.getURL('assets/six_seven.png');
                 feedbackText.textContent = `Ouch! That's a special kind of wrong 🙀`;
@@ -150,13 +163,11 @@ function showMeowPopup() {
     
     submitButton.onclick = handleSubmit;
     inputField.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-            handleSubmit();
-        }
+        if (e.key === 'Enter') handleSubmit();
     });
     
     inputField.focus();
 }
 
-// Uncomment for testing
-showMeowPopup();
+// Uncomment for immediate testing without waiting for background timer
+// showMeowPopup();
