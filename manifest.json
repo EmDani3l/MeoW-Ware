@@ -31,7 +31,9 @@
         "assets/sad1.png",
         "assets/sad2.png",
         "assets/six_seven.png",
-        "assets/tricked1.png"
+        "assets/tricked1.png",
+        "assets/bellycat.png",
+        "assets/bite.png"
       ],
       "matches": ["<all_urls>"]
     }

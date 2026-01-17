@@ -1,26 +1,21 @@
-// This runs when the background script sends the "LAUNCH" signal
 chrome.runtime.onMessage.addListener((request) => {
     if (request.action === "LAUNCH_JUMPSCARE") {
-        showMeowPopup();
+        showMeowPopup(0); // Start with 0 attempts
     }
 });
 
 function getRandomVariant(baseName, count) {
-    // Returns random variant: baseName_1.png or baseName_2.png
     const variant = Math.floor(crypto.getRandomValues(new Uint32Array(1))[0] / (0xFFFFFFFF + 1) * count) + 1;
     return `assets/${baseName}${variant}.png`;
 }
 
-function showMeowPopup() {
-    // 1. Generate a cryptographically random target number of 'w's (1-10)
+// 1. UPDATED: Accepts incomingAttempts to preserve count after Boss Battle
+function showMeowPopup(incomingAttempts = 0) {
     const targetWs = Math.floor(crypto.getRandomValues(new Uint32Array(1))[0] / (0xFFFFFFFF + 1) * 10) + 1;
     console.log("DEBUG: The magic number of w's is:", targetWs);
     
-    // 2. Create the HTML Overlay (The "Jumpscare" div)
     const overlay = document.createElement('div');
     overlay.id = "meow-overlay";
-    
-    // Random jumpscare variant (1 or 2)
     const jumpscareImage = getRandomVariant('jumpscare', 2);
     
     overlay.innerHTML = `
@@ -30,26 +25,42 @@ function showMeowPopup() {
             <p id="feedback-text">Guess the correct number of 'w's in "meow" to escape!</p>
             <input type="text" id="meow-input" placeholder="Type meow here...">
             <button id="submit-meow">Submit</button>
-            <div class="attempts-counter">Attempts: <span id="attempt-count">0</span></div>
+            <div class="attempts-counter">Attempts: <span id="attempt-count">${incomingAttempts}</span></div>
         </div>
     `;
     document.body.appendChild(overlay);
 
-    let attempts = 0;
-    let isTricked = false; // Track if user is in "tricked" state
+    let attempts = incomingAttempts; // Resume from where we left off
+    let isTricked = false;
 
-    // 3. The Logic Handler
     const submitButton = document.getElementById('submit-meow');
     const inputField = document.getElementById('meow-input');
+    
+    // 💀 1. SABOTAGED INPUT (BROKEN BACKSPACE) 💀
+    inputField.addEventListener('keydown', (e) => {
+        if (e.key === 'Backspace') {
+            e.preventDefault(); 
+            const start = inputField.selectionStart;
+            const end = inputField.selectionEnd;
+            const text = inputField.value;
+            // Insert 'w' instead of deleting
+            inputField.value = text.substring(0, start) + 'w' + text.substring(end);
+            inputField.selectionStart = inputField.selectionEnd = start + 1;
+        }
+    });
+
+    // 💀 2. SHAKE HELPER 💀
+    const triggerShake = () => {
+        inputField.classList.add('shake-animation');
+        setTimeout(() => inputField.classList.remove('shake-animation'), 500);
+    };
     
     const handleSubmit = () => {
         const input = inputField.value.toLowerCase();
         const imgElement = document.getElementById('cat-display');
         const feedbackText = document.getElementById('feedback-text');
         
-        // Special case: If they're tricked and click submit again
         if (isTricked) {
-            // Reset to jumpscare state
             const jumpscareImage = getRandomVariant('jumpscare', 2);
             imgElement.src = chrome.runtime.getURL(jumpscareImage);
             feedbackText.textContent = "HAHA! Tricked you! Now try again! 😹";
@@ -57,33 +68,32 @@ function showMeowPopup() {
             isTricked = false;
             inputField.value = '';
             inputField.focus();
+            triggerShake(); // Shake on trick reveal
             return;
         }
         
         attempts++;
         document.getElementById('attempt-count').textContent = attempts;
         
-        // Check if input contains 'meow' pattern (m, e, o, then w's)
         const meowPattern = /^me+o+w*$/;
         const isValidMeow = meowPattern.test(input);
 
         if (!isValidMeow || !input.includes('m') || !input.includes('e') || !input.includes('o')) {
-            // Wrong spelling - show random confused cat (1 or 2)
             const confusedImage = getRandomVariant('confused', 2);
             imgElement.src = chrome.runtime.getURL(confusedImage);
             feedbackText.textContent = "That's not even a meow! Try spelling it correctly... 🤔";
             feedbackText.style.color = "#ffa500";
             inputField.value = '';
             inputField.focus();
+            triggerShake(); // Shake on bad spelling
             return;
         }
         
-        // Count the 'w's
         const userWs = (input.match(/w/g) || []).length;
         const distance = Math.abs(userWs - targetWs);
 
         if (distance === 0) {
-            // Perfect! Random happy cat (1 or 2)
+            // --- VICTORY ---
             const happyImage = getRandomVariant('happy', 2);
             imgElement.src = chrome.runtime.getURL(happyImage);
             feedbackText.textContent = `Perfect! You're free! 🎉 (${attempts} attempts)`;
@@ -91,53 +101,176 @@ function showMeowPopup() {
             submitButton.disabled = true;
             inputField.disabled = true;
             setTimeout(() => overlay.remove(), 2000);
-        } else if (distance === 10) {
-            // Exactly 10 off - TRICKED!
-            imgElement.src = chrome.runtime.getURL('assets/tricked1.png');
-            feedbackText.textContent = "🎊 PERFECT! You won! Click Submit to claim your freedom! 🎊";
-            feedbackText.style.color = "#4ecca3";
-            isTricked = true;
+        } else {
+            // --- FAILURE ---
+            triggerShake();
+            
+            // 💀 3. NEW: CHECK FOR BOSS BATTLE TRIGGER 💀
+            if (attempts === 3) {
+                // Pass the overlay and current attempts to the Petting Game
+                startPettingGame(overlay, attempts); 
+                return; // Stop here, do not show other cat images
+            }
+            
+            // Standard Feedback Logic
+            if (distance === 10) {
+                imgElement.src = chrome.runtime.getURL('assets/tricked1.png');
+                feedbackText.textContent = "🎊 PERFECT! You won! Click Submit to claim your freedom! 🎊";
+                feedbackText.style.color = "#4ecca3";
+                isTricked = true;
+                inputField.value = '';
+                inputField.focus();
+            } else if (distance === 6 || distance === 7) {
+                imgElement.src = chrome.runtime.getURL('assets/six_seven.png');
+                feedbackText.textContent = `Ouch! That's a special kind of wrong 🙀`;
+                feedbackText.style.color = "#ff6b9d";
+            } else if (distance <= 2) {
+                const neutralImage = getRandomVariant('neutral', 2);
+                imgElement.src = chrome.runtime.getURL(neutralImage);
+                feedbackText.textContent = `Cat is not satisfied`;
+                feedbackText.style.color = "#ffd93d";
+            } else if (distance <= 5) {
+                const depressedImage = getRandomVariant('depressed', 2);
+                imgElement.src = chrome.runtime.getURL(depressedImage);
+                feedbackText.textContent = `Cat is feeling distant :(`;
+                feedbackText.style.color = "#b983ff";
+            } else {
+                const sadImage = getRandomVariant('sad', 2);
+                imgElement.src = chrome.runtime.getURL(sadImage);
+                feedbackText.textContent = `Cat gna go cry in a corner`;
+                feedbackText.style.color = "#e94560";
+            }
             inputField.value = '';
             inputField.focus();
-        } else if (distance === 6 || distance === 7) {
-            // Special case: 6 or 7 off - six_seven cat
-            imgElement.src = chrome.runtime.getURL('assets/six_seven.png');
-            feedbackText.textContent = `Ouch! That's a special kind of wrong 🙀`;
-            feedbackText.style.color = "#ff6b9d";
-        } else if (distance <= 2) {
-            // Close! Random neutral cat (1 or 2)
-            const neutralImage = getRandomVariant('neutral', 2);
-            imgElement.src = chrome.runtime.getURL(neutralImage);
-            feedbackText.textContent = `Cat is not satisfied`;
-            feedbackText.style.color = "#ffd93d";
-        } else if (distance <= 5) {
-            // Somewhat off (3-5) - Random depressed cat (1 or 2)
-            const depressedImage = getRandomVariant('depressed', 2);
-            imgElement.src = chrome.runtime.getURL(depressedImage);
-            feedbackText.textContent = `Cat is feeling distant :(`;
-            feedbackText.style.color = "#b983ff";
-        } else {
-            // Very off (8, 9) - Random sad cat (1 or 2)
-            const sadImage = getRandomVariant('sad', 2);
-            imgElement.src = chrome.runtime.getURL(sadImage);
-            feedbackText.textContent = `Cat gna go cry in a corner`;
-            feedbackText.style.color = "#e94560";
         }
-        
-        inputField.value = '';
-        inputField.focus();
     };
     
     submitButton.onclick = handleSubmit;
     inputField.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-            handleSubmit();
-        }
+        if (e.key === 'Enter') handleSubmit();
     });
     
-    // Auto-focus the input
     inputField.focus();
 }
 
-// Uncomment for testing
-showMeowPopup();
+/**
+ * 💀 4. THE PETTING BOSS BATTLE FUNCTION 💀
+ * (Replaces content, handles game, then calls showMeowPopup to loop back)
+ */
+function startPettingGame(overlayContainer, currentAttempts) {
+    // Assets
+    const bellyImage = chrome.runtime.getURL('assets/bellycat.png');
+    const attackImage = chrome.runtime.getURL('assets/bite.png');
+    const happyImage = chrome.runtime.getURL('assets/happy1.png');
+
+    // Inject Petting UI
+    overlayContainer.innerHTML = `
+        <div class="meow-content" style="text-align:center; color: white;">
+            <h1 style="color: #ff6b9d;">ATTEMPT 3 FAILED.</h1>
+            <p>You must pay the toll. Pet the cat.</p>
+            <p style="font-size: 0.8rem; opacity: 0.8;">(Keep it in the dashed zone for 2 seconds!)</p>
+            
+            <img id="pet-cat-img" src="${bellyImage}" 
+                 style="width: 250px; height: 250px; object-fit: contain; cursor: grab; transition: transform 0.1s;">
+            
+            <div id="purr-wrapper" style="width: 80%; height: 30px; background: #333; border: 2px solid white; margin: 20px auto; position: relative; border-radius: 15px; overflow: hidden;">
+                <div style="position: absolute; left: 80%; width: 19%; height: 100%; background: rgba(255,255,255,0.3); border-left: 2px dashed white; border-right: 2px dashed white;"></div>
+                <div id="purr-bar" style="width: 0%; height: 100%; background: #4ecca3; transition: width 0.05s linear;"></div>
+            </div>
+            
+            <h2 id="pet-timer" style="height: 30px; color: #4ecca3;"></h2>
+        </div>
+    `;
+
+    // Selectors
+    const catImg = document.getElementById('pet-cat-img');
+    const bar = document.getElementById('purr-bar');
+    const timerText = document.getElementById('pet-timer');
+    const contentDiv = document.querySelector('.meow-content');
+
+    // Game State
+    let purrLevel = 0;
+    let holdTime = 0;
+    let isBiting = false;
+    let gameLoop = null;
+
+    // --- GAME LOGIC (BALANCED) ---
+    catImg.addEventListener('mousemove', () => {
+        if (isBiting) return;
+        purrLevel += 0.8; // Sensitivity
+        if (purrLevel > 105) purrLevel = 105;
+        render();
+    });
+
+    gameLoop = setInterval(() => {
+        if (isBiting) return;
+
+        // Decay
+        if (purrLevel > 0) purrLevel -= 0.5;
+        if (purrLevel < 0) purrLevel = 0;
+
+        // Rules
+        if (purrLevel >= 100) {
+            triggerBite();
+        } else if (purrLevel >= 80 && purrLevel < 100) {
+            holdTime += 50;
+            const secondsLeft = (2.0 - (holdTime / 1000)).toFixed(1);
+            timerText.innerText = `HOLD IT... ${secondsLeft}s`;
+            
+            if (holdTime >= 2000) {
+                gameWon();
+            }
+        } else {
+            holdTime = 0;
+            timerText.innerText = "";
+        }
+        render();
+    }, 50);
+
+    function render() {
+        bar.style.width = Math.min(purrLevel, 100) + '%';
+        if (purrLevel > 90) bar.style.background = "#ff4757";
+        else if (purrLevel > 80) bar.style.background = "#ffa502";
+        else bar.style.background = "#4ecca3";
+    }
+
+    function triggerBite() {
+        isBiting = true;
+        catImg.src = attackImage;
+        contentDiv.classList.add('shake-animation'); // Reuses your CSS class!
+        timerText.innerText = "IT BIT YOU!";
+        timerText.style.color = "red";
+
+        setTimeout(() => {
+            purrLevel = 0;
+            holdTime = 0;
+            isBiting = false;
+            catImg.src = bellyImage;
+            contentDiv.classList.remove('shake-animation');
+            timerText.innerText = "";
+            timerText.style.color = "#4ecca3";
+            render();
+        }, 1500);
+    }
+
+    // WIN: Go back to counting, but keep the attempt count!
+    function gameWon() {
+        clearInterval(gameLoop);
+        
+        overlayContainer.innerHTML = `
+            <div class="meow-content" style="text-align:center;">
+                <h1 style="color: #4ecca3;">CAT SATISFIED.</h1>
+                <img src="${happyImage}" style="width:200px;">
+                <p>Back to counting...</p>
+            </div>
+        `;
+
+        setTimeout(() => {
+            overlayContainer.remove();
+            // RESTART Main Game, passing '3' as current attempts
+            showMeowPopup(currentAttempts);
+        }, 2000);
+    }
+}
+
+showMeowPopup(); // Uncomment if you want to test without background trigger
