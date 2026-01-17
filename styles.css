@@ -1,3 +1,6 @@
+/* =========================================
+   CONTAINER & LAYOUT
+   ========================================= */
 #meow-overlay {
     position: fixed;
     top: 0;
@@ -8,9 +11,20 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 999999;
+    z-index: 2147483647; /* Maximum possible Z-Index */
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     animation: fadeIn 0.3s ease;
+
+    /* SAFETY RESET: Prevents website CSS from breaking the layout */
+    box-sizing: border-box;
+    line-height: normal;
+    text-align: left;
+    color: #f1f1f1;
+}
+
+/* Force all children to use border-box */
+#meow-overlay * {
+    box-sizing: border-box;
 }
 
 @keyframes fadeIn {
@@ -18,29 +32,46 @@
     to { opacity: 1; }
 }
 
+/* =========================================
+   CONTENT BOX
+   ========================================= */
 .meow-content {
     background: #0f3460;
     padding: 2.5rem;
     border-radius: 20px;
     text-align: center;
     max-width: 450px;
+    width: 90%; /* Responsive on small screens */
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
     border: 2px solid #e94560;
+    position: relative;
 }
 
 .meow-content h1 {
     color: #e94560;
     margin: 0 0 1rem 0;
     font-size: 1.8rem;
+    line-height: 1.2;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 }
 
+.meow-content p {
+    color: #f1f1f1;
+    font-size: 1.1rem;
+    margin: 1rem 0;
+    line-height: 1.5;
+}
+
+/* =========================================
+   IMAGES
+   ========================================= */
 #cat-display {
     width: 250px;
     height: 250px;
-    object-fit: contain;
+    object-fit: contain; /* Ensures images don't stretch */
     margin: 1rem 0;
     border-radius: 10px;
+    background-color: rgba(0,0,0,0.2); /* Dark bg for transparent pngs */
     transition: transform 0.3s ease;
 }
 
@@ -48,12 +79,9 @@
     transform: scale(1.05);
 }
 
-.meow-content p {
-    color: #f1f1f1;
-    font-size: 1.1rem;
-    margin: 1rem 0;
-}
-
+/* =========================================
+   INPUT FIELD
+   ========================================= */
 #meow-input {
     width: 80%;
     padding: 12px;
@@ -64,6 +92,7 @@
     color: #f1f1f1;
     margin: 1rem 0;
     text-align: center;
+    transition: all 0.2s ease;
 }
 
 #meow-input:focus {
@@ -76,6 +105,9 @@
     color: #a0a0a0;
 }
 
+/* =========================================
+   BUTTONS
+   ========================================= */
 #submit-meow {
     background: #e94560;
     color: white;
@@ -86,6 +118,8 @@
     cursor: pointer;
     transition: all 0.3s ease;
     font-weight: bold;
+    position: relative; /* Prepare for moving button logic */
+    z-index: 10;
 }
 
 #submit-meow:hover {
@@ -102,11 +136,33 @@
     background: #666;
     cursor: not-allowed;
     transform: none;
+    box-shadow: none;
 }
 
+/* =========================================
+   COUNTERS & UTILS
+   ========================================= */
 .attempts-counter {
     color: #f1f1f1;
     font-size: 0.9rem;
     margin-top: 1rem;
     opacity: 0.8;
+}
+
+/* =========================================
+   ANIMATIONS (REQUIRED FOR JS LOGIC)
+   ========================================= */
+
+/* The Shake Class - Added by JS on error */
+.shake-animation {
+    animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+    border-color: #ff0000 !important; /* Force Red Border */
+    box-shadow: 0 0 15px rgba(255, 0, 0, 0.6) !important; /* Red Glow */
+}
+
+@keyframes shake {
+    10%, 90% { transform: translate3d(-1px, 0, 0); }
+    20%, 80% { transform: translate3d(2px, 0, 0); }
+    30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+    40%, 60% { transform: translate3d(4px, 0, 0); }
 }
