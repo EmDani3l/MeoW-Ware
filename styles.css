@@ -4,17 +4,109 @@
     left: 0;
     width: 100vw;
     height: 100vh;
-    background-color: rgba(0, 0, 0, 0.9); /* Darken the background */
-    z-index: 9999999; /* Force it to the very front */
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
     display: flex;
-    justify-content: center;
     align-items: center;
-    color: white;
-    font-family: 'Arial', sans-serif;
+    justify-content: center;
+    z-index: 999999;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.meow-content {
+    background: #0f3460;
+    padding: 2.5rem;
+    border-radius: 20px;
+    text-align: center;
+    max-width: 450px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    border: 2px solid #e94560;
+}
+
+.meow-content h1 {
+    color: #e94560;
+    margin: 0 0 1rem 0;
+    font-size: 1.8rem;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+#cat-display {
+    width: 250px;
+    height: 250px;
+    object-fit: contain;
+    margin: 1rem 0;
+    border-radius: 10px;
+    transition: transform 0.3s ease;
+}
+
+#cat-display:hover {
+    transform: scale(1.05);
+}
+
+.meow-content p {
+    color: #f1f1f1;
+    font-size: 1.1rem;
+    margin: 1rem 0;
+}
+
+#meow-input {
+    width: 80%;
+    padding: 12px;
+    font-size: 1.1rem;
+    border: 2px solid #e94560;
+    border-radius: 8px;
+    background: #16213e;
+    color: #f1f1f1;
+    margin: 1rem 0;
     text-align: center;
 }
 
-.meow-content img {
-    max-width: 500px;
-    border: 5px solid red;
+#meow-input:focus {
+    outline: none;
+    border-color: #ff6b9d;
+    box-shadow: 0 0 10px rgba(233, 69, 96, 0.5);
+}
+
+#meow-input::placeholder {
+    color: #a0a0a0;
+}
+
+#submit-meow {
+    background: #e94560;
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    font-size: 1.1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: bold;
+}
+
+#submit-meow:hover {
+    background: #ff6b9d;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(233, 69, 96, 0.4);
+}
+
+#submit-meow:active {
+    transform: translateY(0);
+}
+
+#submit-meow:disabled {
+    background: #666;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.attempts-counter {
+    color: #f1f1f1;
+    font-size: 0.9rem;
+    margin-top: 1rem;
+    opacity: 0.8;
 }

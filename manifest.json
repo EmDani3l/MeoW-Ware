@@ -2,6 +2,7 @@
   "manifest_version": 3,
   "name": "Meow-ware",
   "version": "1.0",
+  "description": "A playful cat-themed challenge that randomly appears. Guess the correct 'meow' to escape!",
   "permissions": ["alarms", "activeTab"],
   "background": {
     "service_worker": "background.js"
@@ -10,12 +11,21 @@
     {
       "matches": ["<all_urls>"],
       "js": ["content.js"],
-      "css": ["styles.css"]
+      "css": ["styles.css"],
+      "run_at": "document_idle"
     }
   ],
   "web_accessible_resources": [
     {
-      "resources": ["assets/*.png"],
+      "resources": [
+        "assets/jumpscare_cat.png",
+        "assets/happy_cat.png",
+        "assets/very_close_cat.png",
+        "assets/neutral_cat.png",
+        "assets/confused_cat.png",
+        "assets/sad_cat.png",
+        "assets/confused_dog.png"
+      ],
       "matches": ["<all_urls>"]
     }
   ]
