@@ -102,25 +102,25 @@ function showMeowPopup() {
         } else if (distance === 6 || distance === 7) {
             // Special case: 6 or 7 off - six_seven cat
             imgElement.src = chrome.runtime.getURL('assets/six_seven.png');
-            feedbackText.textContent = `Ouch! Off by ${distance}... that's a special kind of wrong 🙀`;
+            feedbackText.textContent = `Ouch! That's a special kind of wrong 🙀`;
             feedbackText.style.color = "#ff6b9d";
         } else if (distance <= 2) {
             // Close! Random neutral cat (1 or 2)
             const neutralImage = getRandomVariant('neutral', 2);
             imgElement.src = chrome.runtime.getURL(neutralImage);
-            feedbackText.textContent = `So close! Off by ${distance} 'w'${distance === 1 ? '' : 's'} 😺`;
+            feedbackText.textContent = `Cat is not satisfied`;
             feedbackText.style.color = "#ffd93d";
         } else if (distance <= 5) {
             // Somewhat off (3-5) - Random depressed cat (1 or 2)
             const depressedImage = getRandomVariant('depressed', 2);
             imgElement.src = chrome.runtime.getURL(depressedImage);
-            feedbackText.textContent = `Getting colder... off by ${distance} 'w's 😿`;
+            feedbackText.textContent = `Cat is feeling distant :(`;
             feedbackText.style.color = "#b983ff";
         } else {
             // Very off (8, 9) - Random sad cat (1 or 2)
             const sadImage = getRandomVariant('sad', 2);
             imgElement.src = chrome.runtime.getURL(sadImage);
-            feedbackText.textContent = `Way off! Off by ${distance} 'w's 😭`;
+            feedbackText.textContent = `Cat gna go cry in a corner`;
             feedbackText.style.color = "#e94560";
         }
         
