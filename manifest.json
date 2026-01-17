@@ -18,20 +18,20 @@
   "web_accessible_resources": [
     {
       "resources": [
-        "assets/jumpscare_1.png",
-        "assets/jumpscare_2.png",
-        "assets/happy_1.png",
-        "assets/happy_2.png",
-        "assets/neutral_1.png",
-        "assets/neutral_2.png",
-        "assets/confused_1.png",
-        "assets/confused_2.png",
-        "assets/depressed_1.png",
-        "assets/depressed_2.png",
-        "assets/sad_1.png",
-        "assets/sad_2.png",
-        "assets/six_seven_1.png",
-        "assets/tricked_1.png"
+        "assets/jumpscare1.png",
+        "assets/jumpscare2.png",
+        "assets/happy1.png",
+        "assets/happy2.png",
+        "assets/neutral1.png",
+        "assets/neutral2.png",
+        "assets/confused1.png",
+        "assets/confused2.png",
+        "assets/depressed1.png",
+        "assets/depressed2.png",
+        "assets/sad1.png",
+        "assets/sad2.png",
+        "assets/six_seven.png",
+        "assets/tricked1.png"
       ],
       "matches": ["<all_urls>"]
     }

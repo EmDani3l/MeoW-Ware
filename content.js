@@ -93,7 +93,7 @@ function showMeowPopup() {
             setTimeout(() => overlay.remove(), 2000);
         } else if (distance === 10) {
             // Exactly 10 off - TRICKED!
-            imgElement.src = chrome.runtime.getURL('assets/tricked_1.png');
+            imgElement.src = chrome.runtime.getURL('assets/tricked1.png');
             feedbackText.textContent = "🎊 PERFECT! You won! Click Submit to claim your freedom! 🎊";
             feedbackText.style.color = "#4ecca3";
             isTricked = true;
@@ -101,7 +101,7 @@ function showMeowPopup() {
             inputField.focus();
         } else if (distance === 6 || distance === 7) {
             // Special case: 6 or 7 off - six_seven cat
-            imgElement.src = chrome.runtime.getURL('assets/six_seven_1.png');
+            imgElement.src = chrome.runtime.getURL('assets/six_seven1.png');
             feedbackText.textContent = `Ouch! Off by ${distance}... that's a special kind of wrong 🙀`;
             feedbackText.style.color = "#ff6b9d";
         } else if (distance <= 2) {
