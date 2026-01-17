@@ -82,14 +82,12 @@
     background: #ff6b9d;
     transform: translateY(-2px);
     box-shadow: 0 5px 15px rgba(233, 69, 96, 0.4);
-    cursor: wait; /* Mouse Phobia Trick */
 }
 
 #submit-meow:disabled {
     background: #666;
     cursor: not-allowed;
     transform: none;
-    box-shadow: none;
 }
 
 .attempts-counter {
