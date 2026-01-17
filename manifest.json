@@ -2,8 +2,8 @@
   "manifest_version": 3,
   "name": "Meow-ware",
   "version": "1.0",
-  "description": "A playful cat-themed challenge. Guess the correct 'meow' to escape!",
-  "permissions": ["alarms"],
+  "description": "A playful cat-themed challenge that randomly appears. Guess the correct 'meow' to escape!",
+  "permissions": ["alarms", "activeTab"],
   "background": {
     "service_worker": "background.js"
   },
@@ -18,12 +18,18 @@
   "web_accessible_resources": [
     {
       "resources": [
-        "assets/jumpscare1.png", "assets/jumpscare2.png",
-        "assets/happy1.png", "assets/happy2.png",
-        "assets/neutral1.png", "assets/neutral2.png",
-        "assets/confused1.png", "assets/confused2.png",
-        "assets/depressed1.png", "assets/depressed2.png",
-        "assets/sad1.png", "assets/sad2.png",
+        "assets/jumpscare1.png",
+        "assets/jumpscare2.png",
+        "assets/happy1.png",
+        "assets/happy2.png",
+        "assets/neutral1.png",
+        "assets/neutral2.png",
+        "assets/confused1.png",
+        "assets/confused2.png",
+        "assets/depressed1.png",
+        "assets/depressed2.png",
+        "assets/sad1.png",
+        "assets/sad2.png",
         "assets/six_seven.png",
         "assets/tricked1.png"
       ],
