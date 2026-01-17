@@ -8,7 +8,7 @@ chrome.runtime.onMessage.addListener((request) => {
 function getRandomVariant(baseName, count) {
     // Returns random variant: baseName_1.png or baseName_2.png
     const variant = Math.floor(crypto.getRandomValues(new Uint32Array(1))[0] / (0xFFFFFFFF + 1) * count) + 1;
-    return `assets/${baseName}_${variant}.png`;
+    return `assets/${baseName}${variant}.png`;
 }
 
 function showMeowPopup() {
@@ -101,7 +101,7 @@ function showMeowPopup() {
             inputField.focus();
         } else if (distance === 6 || distance === 7) {
             // Special case: 6 or 7 off - six_seven cat
-            imgElement.src = chrome.runtime.getURL('assets/six_seven1.png');
+            imgElement.src = chrome.runtime.getURL('assets/six_seven.png');
             feedbackText.textContent = `Ouch! Off by ${distance}... that's a special kind of wrong 🙀`;
             feedbackText.style.color = "#ff6b9d";
         } else if (distance <= 2) {
