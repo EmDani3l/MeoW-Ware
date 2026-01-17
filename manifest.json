@@ -2,6 +2,10 @@
   "manifest_version": 3,
   "name": "Meow-ware",
   "version": "1.0",
+  "permissions": ["alarms", "activeTab"],
+  "background": {
+    "service_worker": "background.js"
+  },
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
@@ -11,7 +15,7 @@
   ],
   "web_accessible_resources": [
     {
-      "resources": ["assets/*.jpg"],
+      "resources": ["assets/*.png"],
       "matches": ["<all_urls>"]
     }
   ]

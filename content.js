@@ -6,8 +6,9 @@ chrome.runtime.onMessage.addListener((request) => {
 });
 
 function showMeowPopup() {
-    // 1. Generate a random target number of 'w's (e.g., between 5 and 20)
-    const targetWs = Math.floor(Math.random() * 15) + 5;
+    // 1. Generate a random target number of 'w's (e.g., between 1 and 5)
+    const targetWs = Math.floor(Math.random() * 4) + 1;
+    console.log("DEBUG: The magic number of w's is:", targetWs);
     
     // 2. Create the HTML Overlay (The "Jumpscare" div)
     const overlay = document.createElement('div');
@@ -42,3 +43,5 @@ function showMeowPopup() {
         }
     };
 }
+
+showMeowPopup();
