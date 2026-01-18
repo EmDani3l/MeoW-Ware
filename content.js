@@ -172,7 +172,7 @@ function startPettingGame(overlayContainer, currentAttempts) {
     // Inject Petting UI
     overlayContainer.innerHTML = `
         <div class="meow-content" style="text-align:center; color: white;">
-            <h1 style="color: #ff6b9d;">ATTEMPT 3 FAILED.</h1>
+            <h1 style="color: #ff6b9d;">ATTEMPT FAILED.</h1>
             <p>You must pay the toll. Pet the cat.</p>
             <p style="font-size: 0.8rem; opacity: 0.8;">(Keep it in the dashed zone for 2 seconds!)</p>
             
