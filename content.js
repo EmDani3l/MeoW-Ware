@@ -76,7 +76,7 @@ function showMeowPopup(incomingAttempts = 0) {
         attempts++;
         document.getElementById('attempt-count').textContent = attempts;
         
-        const meowPattern = /^me+o+w*$/;
+        const meowPattern = /^meow+$/;
         const isValidMeow = meowPattern.test(input);
 
         if (!isValidMeow || !input.includes('m') || !input.includes('e') || !input.includes('o')) {
