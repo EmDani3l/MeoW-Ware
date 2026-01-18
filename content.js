@@ -105,12 +105,17 @@ function showMeowPopup(incomingAttempts = 0) {
         } else {
             // --- FAILURE ---
             triggerShake();
-            
-            // 💀 3. CHECK FOR BOSS BATTLE TRIGGER (ONLY ATTEMPT 3) 💀
-            if (attempts === 3) {
+
+            // 💀 3. CHECK FOR BOSS BATTLE TRIGGER (ONLY ATTEMPT 4) 💀
+            if (attempts === 4) {
                 // Pass the overlay and current attempts to the Petting Game
                 startPettingGame(overlay, attempts); 
                 return; // Stop here, do not show other cat images
+            }
+
+            if (attempts === 10) {
+                startExplodingKittens(overlay, attempts);
+                return;
             }
             
             // Standard Feedback Logic
@@ -273,9 +278,159 @@ function startPettingGame(overlayContainer, currentAttempts) {
         }, 2000);
     }
 }
-<<<<<<< HEAD
-showMeowPopup()
-=======
+
+/**
+ * MINI-GAME: EXPLODING KITTENS (Attempt 10)
+ * Now with 10 Unique Innocent Cats
+ */
+function startExplodingKittens(overlayContainer, currentAttempts) {
+    // --- ASSETS ---
+    const dynamiteCat = chrome.runtime.getURL('assets/dynamitecat.png'); 
+    const explosionGif = chrome.runtime.getURL('assets/explosion.gif');
+    const sikeCat = chrome.runtime.getURL('assets/sikecat.png');
+
+    // 1. GENERATE THE 10 INNOCENT CAT URLS
+    // This creates a list: [url_to_innocent1.png, url_to_innocent2.png, ...]
+    const innocentCats = [];
+    for (let i = 1; i <= 10; i++) {
+        innocentCats.push(chrome.runtime.getURL(`assets/innocent${i}.png`));
+    }
+
+    // 2. SETUP THE GRID
+    function renderGame() {
+        const safeIndex = Math.floor(Math.random() * 10); 
+        console.log("Debug: Safe Cat is #" + safeIndex + " (innocent" + (safeIndex+1) + ")");
+
+        overlayContainer.innerHTML = `
+            <div class="meow-content" style="max-width: 600px;">
+                <h1 style="color: #ff6b9d;">EXPLODING KITTENS</h1>
+                <p>Pick the safe cat. The others are rigged.</p>
+                <div class="kitten-grid">
+                    </div>
+            </div>
+        `;
+
+        const grid = overlayContainer.querySelector('.kitten-grid');
+
+        // Loop 0 to 9 to create the cards
+        for (let i = 0; i < 10; i++) {
+            const catItem = document.createElement('div');
+            catItem.className = "kitten-card";
+            
+            // USE THE SPECIFIC CAT IMAGE FOR THIS SLOT
+            // innocentCats[0] is innocent1.png, etc.
+            catItem.innerHTML = `<img src="${innocentCats[i]}">`;
+            
+            catItem.onclick = () => {
+                const isSafe = (i === safeIndex);
+                runTensionLoading(overlayContainer, isSafe);
+            };
+            grid.appendChild(catItem);
+        }
+    }
+
+    // 3. TENSION LOADING (5s Wait)
+    function runTensionLoading(container, isSafe) {
+        const taunts = [
+            "Consulting the Council of Cats...",
+            "Sniffing for fear...",
+            "Calculating explosion probability...",
+            "Judging your life choices...",
+            "Did you really pick that one?",
+            "Loading disappointment...",
+            "Buffering destiny..."
+        ];
+
+        let secondsLeft = 5;
+        
+        container.innerHTML = `
+            <div class="meow-content" style="text-align: center;">
+                <div class="cat-spinner"></div>
+                <h2 id="taunt-text" style="color: #ffd93d; margin-top: 20px;">Processing...</h2>
+                <p style="font-size: 0.9rem; opacity: 0.7;">Please wait...</p>
+            </div>
+        `;
+
+        const textElement = document.getElementById('taunt-text');
+
+        const loadingInterval = setInterval(() => {
+            secondsLeft--;
+            const randomTaunt = taunts[Math.floor(Math.random() * taunts.length)];
+            textElement.innerText = randomTaunt;
+
+            if (secondsLeft <= 0) {
+                clearInterval(loadingInterval);
+                if (isSafe) {
+                    runFakeSuccess(container); 
+                } else {
+                    triggerExplosionSequence(container);
+                }
+            }
+        }, 1000);
+    }
+
+    // 4. FAKE SUCCESS -> SIKE -> PET GAME
+    function runFakeSuccess(container) {
+        container.innerHTML = `
+            <div class="meow-content" style="text-align: center;">
+                <h1 style="color: #4ecca3;">SAFE!</h1>
+                <p>Bomb defused successfully.</p>
+                <p>Bringing you back to your tab...</p>
+                <div class="cat-spinner" style="border-top-color: #4ecca3;"></div> 
+            </div>
+        `;
+
+        setTimeout(() => {
+            container.innerHTML = `
+                <div class="meow-content" style="text-align: center;">
+                    <h1 style="color: #ff6b9d; font-size: 5rem; margin: 0;">SIKE!</h1>
+                    <img src="${sikeCat}" style="width: 300px; height: 300px; object-fit:contain;">
+                    <p style="font-size: 1.5rem; margin-top: 10px;">YOU THOUGHT??</p>
+                </div>
+            `;
+            setTimeout(() => {
+                startPettingGame(container, currentAttempts);
+            }, 2000);
+        }, 3000);
+    }
+
+    // 5. BOMB LOGIC
+    function triggerExplosionSequence(container) {
+        container.innerHTML = `
+            <div class="meow-content" style="text-align: center;">
+                <h1 style="color: red; font-size: 3rem;">RUN!</h1>
+                <img src="${dynamiteCat}" style="width: 250px; height: 250px;">
+                <p>IT WAS A BOMB!</p>
+                <h2 id="bomb-timer" style="font-size: 4rem; color: yellow;">3</h2>
+            </div>
+        `;
+
+        let timeLeft = 3;
+        const timerElement = document.getElementById('bomb-timer');
+
+        const countdown = setInterval(() => {
+            timeLeft--;
+            timerElement.innerText = timeLeft;
+            if (timeLeft <= 0) {
+                clearInterval(countdown);
+                showExplosion(container);
+            }
+        }, 1000);
+    }
+
+    // 6. EXPLOSION & RESET
+    function showExplosion(container) {
+        container.innerHTML = `
+            <div style="display:flex; justify-content:center; align-items:center; height:100vh; background:black; width:100%;">
+                <img src="${explosionGif}" style="width: 100%; height: 100%; object-fit: cover;">
+            </div>
+        `;
+        setTimeout(() => {
+            renderGame(); // Restart with new random safe cat
+        }, 1500);
+    }
+
+    renderGame();
+}
 
 showMeowPopup(0);
->>>>>>> 73b8a7a26f18490bcf3350983299ea1d0c3978a6

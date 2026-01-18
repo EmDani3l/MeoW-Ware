@@ -33,7 +33,11 @@
         "assets/six_seven.png",
         "assets/tricked1.png",
         "assets/bellycat.png",
-        "assets/bite.png"
+        "assets/bite.png",
+        "assets/innocent*.png",
+        "assets/explosion.gif",
+        "assets/dynamitecat.png",
+        "assets/sikecat.png"
       ],
       "matches": ["<all_urls>"]
     }
