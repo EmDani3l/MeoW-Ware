@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Meow-ware",
   "version": "1.0",
-  "description": "A playful cat-themed challenge that randomly appears. Guess the correct 'meow' to escape!",
+  "description": "Guess the correct 'meow' to escape!",
   "permissions": ["alarms", "activeTab"],
   "background": {
     "service_worker": "background.js"
