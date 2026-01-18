@@ -273,4 +273,9 @@ function startPettingGame(overlayContainer, currentAttempts) {
         }, 2000);
     }
 }
+<<<<<<< HEAD
 showMeowPopup()
+=======
+
+showMeowPopup(0);
+>>>>>>> 73b8a7a26f18490bcf3350983299ea1d0c3978a6
