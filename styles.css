@@ -177,3 +177,37 @@
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
+
+/* THE NO ESCAPE OVERLAY */
+#no-escape-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: black;
+    z-index: 2147483647; /* Max Z-Index */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    animation: flash 0.2s; /* Scary flash effect */
+}
+
+#no-escape-overlay h1 {
+    font-family: 'Courier New', Courier, monospace; /* Serious font */
+    font-size: 8rem;
+    font-weight: 900;
+    color: white;
+    text-transform: uppercase;
+    letter-spacing: 10px;
+    margin-top: 20px;
+}
+
+#no-escape-overlay img {
+    width: 400px;
+    height: 400px;
+    object-fit: cover;
+    border: 5px solid red;
+    box-shadow: 0 0 50px red;
+}

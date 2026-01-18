@@ -1,3 +1,4 @@
+let isTrapActive = false; // By default, let them leave.
 // Listen for the background script trigger
 chrome.runtime.onMessage.addListener((request) => {
     if (request.action === "LAUNCH_JUMPSCARE") {
@@ -12,6 +13,7 @@ function getRandomVariant(baseName, count) {
 
 // 1. UPDATED: Accepts incomingAttempts to preserve count after Boss Battle
 function showMeowPopup(incomingAttempts = 0) {
+    isTrapActive = true;
     const targetWs = Math.floor(crypto.getRandomValues(new Uint32Array(1))[0] / (0xFFFFFFFF + 1) * 10) + 1;
     console.log("DEBUG: The magic number of w's is:", targetWs);
     
@@ -95,6 +97,7 @@ function showMeowPopup(incomingAttempts = 0) {
 
         if (distance === 0) {
             // --- VICTORY ---
+            isTrapActive = false
             const happyImage = getRandomVariant('happy', 2);
             imgElement.src = chrome.runtime.getURL(happyImage);
             feedbackText.textContent = `Perfect! You're free! 🎉 (${attempts} attempts)`;
@@ -102,7 +105,10 @@ function showMeowPopup(incomingAttempts = 0) {
             submitButton.disabled = true;
             inputField.disabled = true;
             setTimeout(() => overlay.remove(), 2000);
-        } else {
+        } 
+        
+        
+        else {
             // --- FAILURE ---
             triggerShake();
 
@@ -116,6 +122,17 @@ function showMeowPopup(incomingAttempts = 0) {
             if (attempts === 10) {
                 startExplodingKittens(overlay, attempts);
                 return;
+            
+            }
+
+            if (attempts === 15) {
+                isTrapActive = false; // <--- TURN OFF TRAP SO BROWSER CAN CLOSE
+                const feedbackText = document.getElementById('feedback-text');
+                feedbackText.textContent = "You have tested my patience. Goodbye.";
+                submitButton.disabled = true;
+                inputField.disabled = true;
+                setTimeout(() => overlay.remove(), 2000);
+            // ... rest of nuke logic ...
             }
             
             // Standard Feedback Logic
@@ -426,11 +443,72 @@ function startExplodingKittens(overlayContainer, currentAttempts) {
             </div>
         `;
         setTimeout(() => {
-            renderGame(); // Restart with new random safe cat
+            
+            if (chrome.runtime?.id) {
+                renderGame(); 
+            }
         }, 1500);
     }
 
     renderGame();
 }
+
+// ======================================================
+// THE "NO ESCAPE" PROTOCOL (Conditional)
+// ======================================================
+
+function triggerNoEscape() {
+    // 1. SAFETY CHECK: If the game isn't running, do nothing.
+    if (!isTrapActive) return; 
+
+    // 2. Prevent spamming the overlay
+    if (document.getElementById('no-escape-overlay')) return;
+
+    // Assets
+    const angryCat = chrome.runtime.getURL('assets/cheatcat.png'); 
+
+    const overlay = document.createElement('div');
+    overlay.id = "no-escape-overlay";
+    overlay.innerHTML = `
+        <img src="${angryCat}">
+        <h1>Meow.</h1>
+    `;
+    
+    document.body.appendChild(overlay);
+
+    // Remove it after 2 seconds
+    setTimeout(() => {
+        overlay.remove();
+    }, 2000);
+}
+
+// Mouse Trap
+document.addEventListener('mouseleave', (e) => {
+    if (!isTrapActive) return; // Check flag
+    if (e.clientY < 5) {
+        triggerNoEscape();
+    }
+});
+
+// Keyboard Trap (Ctrl+W)
+document.addEventListener('keydown', (e) => {
+    if (!isTrapActive) return; // Check flag
+    
+    if ((e.ctrlKey || e.metaKey) && e.key === 'w') {
+        e.preventDefault();
+        e.stopPropagation();
+        triggerNoEscape();
+        e.return = 'Meow.'; 
+    }
+});
+
+// Browser "Are you sure?" Prompt
+window.addEventListener('beforeunload', (e) => {
+    if (!isTrapActive) return; // Check flag
+    
+    e.preventDefault();
+    e.return = ''; 
+    triggerNoEscape();
+});
 
 showMeowPopup(0);
