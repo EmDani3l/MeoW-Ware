@@ -37,7 +37,8 @@
         "assets/innocent*.png",
         "assets/explosion.gif",
         "assets/dynamitecat.png",
-        "assets/sikecat.png"
+        "assets/sikecat.png",
+        "assets/cheatcat.png"
       ],
       "matches": ["<all_urls>"]
     }
